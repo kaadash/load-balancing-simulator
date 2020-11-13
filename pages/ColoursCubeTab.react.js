@@ -1,61 +1,91 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Scene, PerspectiveCamera, WebGLRenderer, GridHelper, Geometry, Vector3, Points, PointsMaterial, BoxBufferGeometry,
-  Mesh, MeshBasicMaterial, Math
+  Scene, PerspectiveCamera,
+  WebGLRenderer, SphereGeometry,
+  MeshBasicMaterial, MeshPhongMaterial, Mesh, LineBasicMaterial, Vector3,
+  BufferGeometry,
+  Line,
+  PointLight,
+  AmbientLight,
 } from "THREE";
 
+import * as THREE from "three";
 
-export default () => {
+
+global.THREE = global.THREE || THREE;
+
+import 'three/examples/js/controls/OrbitControls';
+
+// import OrbitControls from 'three/examples/js/controls/OrbitControls.js';
+
+// import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+
+
+export default (props) => {
   // Zadeklaruj nową zmienną stanu, którą nazwiemy „count”
   const rootElement = useRef(null);
+  // const generatePoints = () => {
+  //   return props.pro
+  // }
+
+  const renderProcessors = () => {
+
+  }
 
   useEffect(() => {
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(60, 1200 / 600, 1, 1000);
-    camera.position.set(2, 5, 10);
-    const renderer = new WebGLRenderer({
-      antialias: true
-    });
-    renderer.setSize(1200, 600);
+    const renderer = new WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
     rootElement.current.appendChild(renderer.domElement);
 
-    // const controls = new OrbitControls(camera, renderer.domElement);
+    const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+    camera.position.set(0, 0, 100);
+    camera.lookAt(0, 0, 0);
 
-    scene.add(new GridHelper(10, 10));
+    const scene = new Scene();
+    const ambientLight = new AmbientLight(0xa0a0a0); // soft white light
+    scene.add(ambientLight);
 
-    const pointsGeom = new Geometry();
-    pointsGeom.vertices.push(
-      new Vector3(Math.randFloat(-5, 5), Math.randFloat(-2.5, 2.5), Math.randFloat(-5, 5)),
-      new Vector3(Math.randFloat(-5, 5), Math.randFloat(-2.5, 2.5), Math.randFloat(-5, 5))
-    )
+    const geometry = new SphereGeometry(5, 32, 32);
+    const material = new MeshPhongMaterial({ color: 0x12b912 });
+    const lineMaterial = new LineBasicMaterial({ color: 0x0000ff });
+    const sphere = new Mesh(geometry, material);
+    const points = [];
+    const color = 0xFFFFFF;
+    const intensity = 0.5;
+    const light = new global.THREE.DirectionalLight(color, intensity);
+    light.position.set(-5, 5, 5);
+    light.target.position.set(-5, 0, 0);
+    scene.add(light);
+    scene.add(light.target);
 
-    const points = new Points(pointsGeom, new PointsMaterial({
-      color: "red",
-      size: 0.5
-    }));
-    scene.add(points);
 
-    const cubeDiagonal = new Vector3().copy(pointsGeom.vertices[1]).sub(pointsGeom.vertices[0]).length(); // cube's diagonal
-    const center = new Vector3().copy(pointsGeom.vertices[0]).add(pointsGeom.vertices[1]).multiplyScalar(0.5); // cube's center
+    points.push(new Vector3(- 10, 0, 0));
+    points.push(new Vector3(0, 10, 0));
+    points.push(new Vector3(10, 0, 0));
 
-    const cubeSide = (cubeDiagonal * window.Math.sqrt(3)) / 3; // cube's edge's length via cube's diagonal
+    const lineGeometry = new BufferGeometry().setFromPoints(points);
+    const line = new Line(lineGeometry, lineMaterial);
 
-    const cubeGeom = new BoxBufferGeometry(cubeSide, cubeSide, cubeSide);
-    cubeGeom.rotateY(window.Math.PI * 0.25); // rotate around Y
-    cubeGeom.rotateX(window.Math.atan(window.Math.sqrt(2) * 0.5)); // rotate around X, using angle between cube's diagonal and its projection on a cube's face
-    const cube = new Mesh(cubeGeom, new MeshBasicMaterial({
-      color: "aqua",
-      wireframe: true
-    }));
-    cube.position.copy(center); // set position of the cube
-    cube.lookAt(pointsGeom.vertices[0]); // let Three.js do the job for us
-    scene.add(cube)
+    scene.add(sphere);
+    scene.add(line);
 
-    render();
+    const controls = new global.THREE.OrbitControls(camera, renderer.domElement);
+    controls.update();
 
-    function render() {
-      requestAnimationFrame(render);
+    renderer.render(scene, camera);
+
+    function animate() {
+
+      requestAnimationFrame(animate);
+      // required if controls.enableDamping or controls.autoRotate are set to true
+      controls.update();
       renderer.render(scene, camera);
+    }
+    animate();
+    return () => {
+      console.log('rootElement', rootElement.current);
+      rootElement.current.innerHTML = '';
     }
   }, [])
 

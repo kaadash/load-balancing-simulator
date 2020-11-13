@@ -10,8 +10,50 @@ import { Layout } from 'antd';
 import { Card } from 'antd';
 const { Header, Footer, Content } = Layout;
 const { TabPane } = Tabs;
+import { generateTopology } from './TopologyGenerator'
 
 export default function Home() {
+  const allProcesors = generateTopology(3, 3, 3);
+  console.log(allProcesors.map(processor => processor.currentLoad));
+  // ASYNC DIFFUSION
+  // const diffusion = 0.2;
+  // setInterval(() => {
+  //   allProcesors.forEach((processor) => {
+  //     processor.neighbours.forEach(neighbourProcess => {
+  //       const diff = processor.currentLoad - neighbourProcess.currentLoad;
+  //       const absDiff = Math.abs(diff);
+  //       const loadToTransfer = Math.floor(diffusion * absDiff);
+  //       if (diff > 0) {
+  //         processor.currentLoad = processor.currentLoad - loadToTransfer;
+  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad + loadToTransfer;
+  //       } else {
+  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad - loadToTransfer;
+  //         processor.currentLoad = processor.currentLoad + loadToTransfer;
+  //       }
+  //     })
+  //   })
+  //   console.log(allProcesors.map(processor => processor.currentLoad));
+  // }, 3000);
+  
+  // SECOND DIFFUSION
+  const diffusion = 0.9;
+  // setInterval(() => {
+  //   allProcesors.forEach((processor) => {
+  //     processor.neighbours.forEach(neighbourProcess => {
+  //       const diff = processor.currentLoad - neighbourProcess.currentLoad;
+  //       const absDiff = Math.abs(diff);
+  //       const loadToTransfer = Math.floor(diffusion * absDiff);
+  //       if (diff > 0) {
+  //         processor.currentLoad = processor.currentLoad - loadToTransfer;
+  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad + loadToTransfer;
+  //       } else {
+  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad - loadToTransfer;
+  //         processor.currentLoad = processor.currentLoad + loadToTransfer;
+  //       }
+  //     })
+  //   })
+  //   console.log(allProcesors.map(processor => processor.currentLoad));
+  // }, 3000);
   return (
     <Layout>
       <Head>
@@ -36,7 +78,7 @@ export default function Home() {
                 <HistoryTab />
               </TabPane>
               <TabPane tab="Coloured" key="3">
-                <ColoursCubeTab />
+                <ColoursCubeTab processors={allProcesors} />
               </TabPane>
             </Tabs>
           </Card>
