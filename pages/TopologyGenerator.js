@@ -7,7 +7,7 @@ export const findProcessByPosition = (processors, x, y, z) => {
     })
 }
 
-export const generateTopology = (x = 1, y = 1, z = 1) => {
+export const generateTopology = (x = 1, y = 1, z = 1, maxTasks = 1000) => {
     const xRange = range(0, x);
     const yRange = range(0, y);
     const zRange = range(0, z);
@@ -21,7 +21,7 @@ export const generateTopology = (x = 1, y = 1, z = 1) => {
                     x: xId,
                     y: yId,
                     z: zId,
-                    currentLoad: Math.floor(Math.random() * 1000)
+                    currentLoad: Math.floor(Math.random() * maxTasks)
                 });
                 processors.push(currentProcessor);
                 if (xId > 0) {

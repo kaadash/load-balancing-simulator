@@ -10,11 +10,18 @@ import { Layout } from 'antd';
 import { Card } from 'antd';
 const { Header, Footer, Content } = Layout;
 const { TabPane } = Tabs;
+import React, { useState } from 'react';
 import { generateTopology } from './TopologyGenerator'
 
 export default function Home() {
-  const allProcesors = generateTopology(3, 3, 3);
-  console.log(allProcesors.map(processor => processor.currentLoad));
+  const [topologySize, setTopologySize] = useState({x: 10, y: 3, z: 3});
+  const allProcesors = generateTopology(topologySize.x, topologySize.y, topologySize.z);
+  const sumOfTasks = allProcesors.reduce((acc, processor) => {
+    acc += processor.currentLoad
+    return acc;
+  }, 0);
+  const avgTasks = Math.floor(sumOfTasks / allProcesors.length);
+  console.log(avgTasks, allProcesors.map(processor => processor.currentLoad));
   // ASYNC DIFFUSION
   // const diffusion = 0.2;
   // setInterval(() => {
@@ -34,7 +41,7 @@ export default function Home() {
   //   })
   //   console.log(allProcesors.map(processor => processor.currentLoad));
   // }, 3000);
-  
+
   // SECOND DIFFUSION
   const diffusion = 0.9;
   // setInterval(() => {
@@ -59,6 +66,7 @@ export default function Home() {
       <Head>
         <title>Load balancing simulator</title>
         <link rel="icon" href="/favicon.ico" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.min.js" integrity="sha512-bzjaf85dHTL4H0BvkAJ/Jbvxqf1rDj+jVpCNe3oxQj/RXSnkx1HnKhqIcmMWghxEAbXsYgddrc38saWpltlkug==" crossorigin="anonymous"></script>
       </Head>
       <Content>
         <div className={styles.container}>
@@ -78,7 +86,7 @@ export default function Home() {
                 <HistoryTab />
               </TabPane>
               <TabPane tab="Coloured" key="3">
-                <ColoursCubeTab processors={allProcesors} />
+                <ColoursCubeTab processors={allProcesors} size={topologySize} avgTasks={avgTasks} maxTasks={1000} />
               </TabPane>
             </Tabs>
           </Card>
