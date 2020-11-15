@@ -12,16 +12,18 @@ const { Header, Footer, Content } = Layout;
 const { TabPane } = Tabs;
 import React, { useState } from 'react';
 import { generateTopology } from './TopologyGenerator'
+import 'three';
+
 
 export default function Home() {
   const [topologySize, setTopologySize] = useState({x: 10, y: 3, z: 3});
-  const allProcesors = generateTopology(topologySize.x, topologySize.y, topologySize.z);
+  const [started, setStarted] = useState(false);
+  const [allProcesors, setAllProcessors] = useState(generateTopology(topologySize.x, topologySize.y, topologySize.z));
   const sumOfTasks = allProcesors.reduce((acc, processor) => {
     acc += processor.currentLoad
     return acc;
   }, 0);
   const avgTasks = Math.floor(sumOfTasks / allProcesors.length);
-  console.log(avgTasks, allProcesors.map(processor => processor.currentLoad));
   // ASYNC DIFFUSION
   // const diffusion = 0.2;
   // setInterval(() => {
@@ -61,17 +63,23 @@ export default function Home() {
   //   })
   //   console.log(allProcesors.map(processor => processor.currentLoad));
   // }, 3000);
+
+  const onStartSimulation = (started, formData) => {
+    console.log('onStartSimulation', formData);
+    setStarted(started);
+  }
+
   return (
     <Layout>
       <Head>
         <title>Load balancing simulator</title>
         <link rel="icon" href="/favicon.ico" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.min.js" integrity="sha512-bzjaf85dHTL4H0BvkAJ/Jbvxqf1rDj+jVpCNe3oxQj/RXSnkx1HnKhqIcmMWghxEAbXsYgddrc38saWpltlkug==" crossorigin="anonymous"></script>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.min.js" integrity="sha512-bzjaf85dHTL4H0BvkAJ/Jbvxqf1rDj+jVpCNe3oxQj/RXSnkx1HnKhqIcmMWghxEAbXsYgddrc38saWpltlkug==" crossorigin="anonymous"></script>
       </Head>
       <Content>
         <div className={styles.container}>
           <Card>
-            <Controls />
+            <Controls onStart={onStartSimulation} started={started} />
           </Card>
         </div>
       </Content>
@@ -80,13 +88,18 @@ export default function Home() {
           <Card>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Current Load" key="1">
-                <CurrentLoadTab />
+                <CurrentLoadTab processors={allProcesors} />
               </TabPane>
               <TabPane tab="History Load" key="2">
                 <HistoryTab />
               </TabPane>
               <TabPane tab="Coloured" key="3">
-                <ColoursCubeTab processors={allProcesors} size={topologySize} avgTasks={avgTasks} maxTasks={1000} />
+                <ColoursCubeTab
+                  processors={allProcesors}
+                  size={topologySize}
+                  avgTasks={avgTasks}
+                  maxTasks={1000}
+                />
               </TabPane>
             </Tabs>
           </Card>

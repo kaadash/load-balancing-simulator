@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Scene, PerspectiveCamera,
-  WebGLRenderer, SphereGeometry,
-  MeshBasicMaterial, MeshPhongMaterial, Mesh, LineBasicMaterial, Vector3,
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  SphereGeometry,
+  MeshPhongMaterial,
+  Mesh,
+  LineBasicMaterial,
+  Vector3,
   BufferGeometry,
   Line,
-  PointLight,
   AmbientLight,
-} from "THREE";
+} from "three";
 
-import 'three/examples/js/controls/OrbitControls';
+import styles from '../styles/Home.module.css'
 
+import './OrbitControls';
 
 const hsv2rgb = function (h, s, v) {
   var rgb, i, data = [];
@@ -49,6 +54,10 @@ const hsv2rgb = function (h, s, v) {
 export default (props) => {
   // Zadeklaruj nową zmienną stanu, którą nazwiemy „count”
   const rootElement = useRef(null);
+  const [processorTooltip, setProcessorTooltip] = useState({
+    id: '',
+    currentLoad: ''
+  })
 
   const MULTIPLIER = 20;
 
@@ -57,12 +66,11 @@ export default (props) => {
       const normalizedValue = Math.floor((processor.currentLoad / props.maxTasks) * 100);
       const h = Math.floor((100 - normalizedValue) * 120 / 100);
       const s = Math.abs(normalizedValue - 50) / 50;
-      console.log('hsv2rgb(h, s, 1)', props.maxTasks, processor.currentLoad, normalizedValue, hsv2rgb(h, s, 1))
-      // rgbToHex(hsv2rgb(h, s, 1))
 
       const geometry = new SphereGeometry(3, 32, 32);
       const material = new MeshPhongMaterial({ color: +`0x${hsv2rgb(h, s, 1)}` });
       const sphere = new Mesh(geometry, material);
+      sphere.userData.processor = processor;
       sphere.position.copy(
         new Vector3(
           (processor.x * MULTIPLIER) - Math.floor(MULTIPLIER * props.size.x / 2),
@@ -75,7 +83,6 @@ export default (props) => {
   }
 
   const renderLines = (scene) => {
-
     props.processors.forEach(processor => {
       const points = [];
       processor.neighbours.forEach((neighbour) => {
@@ -116,15 +123,32 @@ export default (props) => {
   }
 
   const addCamera = () => {
-    const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
-    camera.position.set(0, 0, 150);
+    const camera = new PerspectiveCamera(
+      45,
+      rootElement.current.offsetWidth / rootElement.current.offsetHeight,
+      1,
+      1000
+    );
+    camera.position.set(0, 0, 300);
     camera.lookAt(0, 0, 0);
     return camera;
   }
 
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function onMouseMove(event) {
+    event.preventDefault();
+    mouse.x = (event.offsetX / rootElement.current.offsetWidth) * 2 - 1;
+    mouse.y = - (event.offsetY / rootElement.current.offsetHeight) * 2 + 1;
+
+  }
+
   useEffect(() => {
+    let prevIntersectedId = '';
+
     const renderer = new WebGLRenderer({ alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(rootElement.current.offsetWidth, rootElement.current.offsetHeight);
     renderer.setClearColor(0x000000, 0);
     rootElement.current.appendChild(renderer.domElement);
     const scene = new Scene();
@@ -136,14 +160,32 @@ export default (props) => {
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.update();
+    const render = () => {
+      requestAnimationFrame(render);
 
-    function animate() {
-      requestAnimationFrame(animate);
-      // required if controls.enableDamping or controls.autoRotate are set to true
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+
+      if (intersects.length > 0) {
+        const currentIntersected = intersects[0].object;
+        if (currentIntersected && currentIntersected.userData && currentIntersected.userData.processor && currentIntersected.userData.processor.id) {
+          if (currentIntersected.userData.processor.id !== prevIntersectedId) {
+            console.log(currentIntersected.userData.processor.id, prevIntersectedId);
+            prevIntersectedId = currentIntersected.userData.processor.id;
+            setProcessorTooltip({
+              id: currentIntersected.userData.processor.id,
+              currentLoad: currentIntersected.userData.processor.currentLoad
+            })
+          }
+        }
+      }
       controls.update();
       renderer.render(scene, camera);
     }
-    animate();
+
+    window.addEventListener('mousemove', onMouseMove, false);
+    render();
 
     return () => {
       rootElement.current.innerHTML = '';
@@ -151,7 +193,17 @@ export default (props) => {
   }, [])
 
   return (
-    <div ref={rootElement}>
+    <div>
+      <div className={styles.tooltip}>
+        <div className={styles.tooltipName}>
+          ID: {processorTooltip.id}
+        </div>
+        <div className={styles.tooltipLoad}>
+          Current load: {processorTooltip.currentLoad}
+        </div>
+      </div>
+      <div className={styles.colorCubesContainer} ref={rootElement}>
+      </div>
     </div>
   );
 }

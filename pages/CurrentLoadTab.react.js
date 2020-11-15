@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar'
 import {
   Form,
@@ -9,6 +9,8 @@ import {
   Slider,
   Table
 } from 'antd';
+
+import { flatten } from 'lodash';
 
 const formItemLayout = {
   labelCol: {
@@ -33,34 +35,14 @@ const data = [
 
 
 const columns = [
-  {
-    title: 'Full Name',
-    width: 100,
-    dataIndex: 'name',
-    key: 'name',
-    fixed: 'left',
-  },
-  {
-    title: 'Age',
-    width: 100,
-    dataIndex: 'age',
-    key: 'age',
-    fixed: 'left',
-  },
   { title: 'Column 1', dataIndex: 'address', key: '1' },
-  { title: 'Column 2', dataIndex: 'address', key: '2' },
-  { title: 'Column 3', dataIndex: 'address', key: '3' },
-  { title: 'Column 4', dataIndex: 'address', key: '4' },
-  { title: 'Column 5', dataIndex: 'address', key: '5' },
-  { title: 'Column 6', dataIndex: 'address', key: '6' },
-  { title: 'Column 7', dataIndex: 'address', key: '7' },
-  { title: 'Column 8', dataIndex: 'address', key: '8' },
+
   {
     title: 'Action',
     key: 'operation',
     fixed: 'right',
     width: 100,
-    render: () => <a>action</a>,
+    render: () => <a>Apply changes</a>,
   },
 ];
 
@@ -71,15 +53,36 @@ const dataTable = [
     age: 32,
     address: 'New York Park',
   },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 40,
-    address: 'London Park',
-  },
 ];
 
-export const CurrentLoadTab = () => {
+export const CurrentLoadTab = (props) => {
+  const [chartKeys, setChartKeys] = useState([]);
+  const [chartValues, setChartValues] = useState([]);
+  const [tableHeader, setTableHeader] = useState([
+    { title: 'Processor ID', dataIndex: 'id', key: '1' },
+    { title: 'Current load', dataIndex: 'currentLoad', key: '2' },
+    {
+      title: 'Action',
+      key: 'operation',
+      fixed: 'right',
+      width: 200,
+      render: () => <a>Change current load</a>,
+    },
+  ]);
+  const [tableData, setTableData] = useState([]);
+  useEffect(() => {
+    setChartKeys((props.processors || []).map(processor => processor.id));
+    setChartValues([(props.processors || []).reduce((acc, processor) => {
+      acc[processor.id] = processor.currentLoad;
+      return acc;
+    }, {})]);
+    setTableData((props.processors || []).map((processor) => {
+      return {
+        id: processor.id,
+        currentLoad: processor.currentLoad,
+      }
+    }));
+  }, [props.processors]);
   return (
     <div>
       <Radio.Group>
@@ -88,13 +91,13 @@ export const CurrentLoadTab = () => {
       </Radio.Group>
 
       <div>
-        <Table columns={columns} dataSource={dataTable} scroll={{ x: 1300 }} />
+        <Table columns={tableHeader} dataSource={tableData} scroll={{ x: 1300 }} />
       </div>
-      <div style={{ height: '300px', width: '600px', }}>
+      <div style={{ height: '300px', width: '1300px', }}>
         <ResponsiveBar
-          data={data}
+          data={chartValues}
           groupMode="grouped"
-          keys={['hot dog', 'burger', 'sandwich', 'kebab', 'fries', 'donut']}
+          keys={chartKeys}
           indexBy="country"
           margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
           colors={{ scheme: 'nivo' }}

@@ -14,3 +14,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.ant-table-cell {
+  white-space: nowrap;
+}

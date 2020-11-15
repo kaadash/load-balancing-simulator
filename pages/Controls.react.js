@@ -1,13 +1,11 @@
 import React from 'react';
 import {
   Form,
-  Select,
   InputNumber,
   Switch,
   Radio,
   Slider,
 } from 'antd';
-const { Option } = Select;
 const formItemLayout = {
   labelCol: {
     span: 6,
@@ -17,61 +15,56 @@ const formItemLayout = {
   },
 };
 
-const normFile = (e) => {
-  console.log('Upload event:', e);
+export default (props) => {
+  const [formData] = Form.useForm();
 
-  if (Array.isArray(e)) {
-    return e;
+  const onStart = (selected) => {
+    console.log('selected', formData);
+    props.onStart(selected, formData.getFieldsValue());
   }
-
-  return e && e.fileList;
-};
-
-export default () => {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-  };
 
   return (
     <Form
+      form={formData}
       name="validate_other"
       {...formItemLayout}
-      onFinish={onFinish}
       initialValues={{
-        ['input-number']: 3,
+        ['size-x']: 3,
+        ['size-y']: 3,
+        ['size-z']: 3,
+        ['algorithm']: 'diffusion_1',
+        ['diffusion']: 50,
         ['checkbox-group']: ['A', 'B'],
         rate: 3.5,
       }}
     >
-      <Form.Item name="radio-group" label="Radio.Group">
-        <Radio.Group>
+      <Form.Item name="algorithm" label="Algorithm:">
+        <Radio.Group disabled={props.started}>
           <Radio.Button value="diffusion_1">Diffusion 1</Radio.Button>
           <Radio.Button value="diffusion_2">Diffusion 2</Radio.Button>
           <Radio.Button value="nna_async">NNA Async</Radio.Button>
           <Radio.Button value="nna_sync">NNA Sync</Radio.Button>
         </Radio.Group>
       </Form.Item>
-      <Form.Item label="Size:">
-        <span className="ant-form-text">X/Y/Z</span>
-      </Form.Item>
       <Form.Item label="Size X:">
         <Form.Item name="size-x" noStyle>
-          <InputNumber min={1} max={10} />
+          <InputNumber disabled={props.started} min={1} max={10} />
         </Form.Item>
       </Form.Item>
       <Form.Item label="Size Y:">
         <Form.Item name="size-y" noStyle>
-          <InputNumber min={1} max={10} />
+          <InputNumber disabled={props.started} min={1} max={10} />
         </Form.Item>
       </Form.Item>
       <Form.Item label="Size Z:">
         <Form.Item name="size-z" noStyle>
-          <InputNumber min={1} max={10} />
+          <InputNumber disabled={props.started} min={1} max={10} />
         </Form.Item>
       </Form.Item>
 
       <Form.Item name="diffusion" label="diffusion">
         <Slider
+          disabled={props.started}
           marks={{
             0: '0',
             100: '0.99',
@@ -79,7 +72,7 @@ export default () => {
         />
       </Form.Item>
       <Form.Item name="switch" label="Start/Stop" valuePropName="checked">
-        <Switch />
+        <Switch onChange={(selected) => onStart(selected)} />
       </Form.Item>
     </Form>
   );
