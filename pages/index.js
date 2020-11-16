@@ -25,27 +25,33 @@ export default function Home() {
   }, 0);
   const avgTasks = Math.floor(sumOfTasks / allProcesors.length);
   // ASYNC DIFFUSION
-  // const diffusion = 0.2;
-  // setInterval(() => {
-  //   allProcesors.forEach((processor) => {
-  //     processor.neighbours.forEach(neighbourProcess => {
-  //       const diff = processor.currentLoad - neighbourProcess.currentLoad;
-  //       const absDiff = Math.abs(diff);
-  //       const loadToTransfer = Math.floor(diffusion * absDiff);
-  //       if (diff > 0) {
-  //         processor.currentLoad = processor.currentLoad - loadToTransfer;
-  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad + loadToTransfer;
-  //       } else {
-  //         neighbourProcess.currentLoad = neighbourProcess.currentLoad - loadToTransfer;
-  //         processor.currentLoad = processor.currentLoad + loadToTransfer;
-  //       }
-  //     })
-  //   })
-  //   console.log(allProcesors.map(processor => processor.currentLoad));
-  // }, 3000);
+  const diffusion = 0.2;
+  setInterval(() => {
+    const newProcessors = allProcesors.map((processor) => {
+      const newProcessorNeighbours = processor.neighbours.map(neighbourProcess => {
+        const diff = processor.currentLoad - neighbourProcess.currentLoad;
+        const absDiff = Math.abs(diff);
+        const loadToTransfer = Math.floor(diffusion * absDiff);
+        if (diff > 0) {
+          processor.currentLoad = processor.currentLoad - loadToTransfer;
+          neighbourProcess.currentLoad = neighbourProcess.currentLoad + loadToTransfer;
+        } else {
+          neighbourProcess.currentLoad = neighbourProcess.currentLoad - loadToTransfer;
+          processor.currentLoad = processor.currentLoad + loadToTransfer;
+        }
+        return neighbourProcess;
+      })
+      return {
+        ...processor,
+        currentLoad: processor.currentLoad,
+        neighbours: [...newProcessorNeighbours]
+      }
+    })
+    setAllProcessors(newProcessors);
+  }, 7000);
 
   // SECOND DIFFUSION
-  const diffusion = 0.9;
+  // const diffusion = 0.9;
   // setInterval(() => {
   //   allProcesors.forEach((processor) => {
   //     processor.neighbours.forEach(neighbourProcess => {
