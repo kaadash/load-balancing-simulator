@@ -83,7 +83,7 @@ export class Topology3DView {
 
     removeAll() {
         for (let i = this.scene.children.length - 1; i >= 0; i--) {
-            if (this.scene.children[i].type === "Mesh") {
+            if (this.scene.children[i].type === "Mesh" || this.scene.children[i].type === 'Line') {
                 this.scene.remove(this.scene.children[i]);
             }
         }

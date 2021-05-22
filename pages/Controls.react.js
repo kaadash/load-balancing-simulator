@@ -23,15 +23,20 @@ export default (props) => {
     props.onStart(selected, formData.getFieldsValue());
   }
 
+  const onChange = (event, value) => {
+    props.onChangeValues(value);
+  }
+
   return (
     <Form
       form={formData}
+      onFieldsChange={onChange}
       name="validate_other"
       {...formItemLayout}
       initialValues={{
-        ['size-x']: 3,
-        ['size-y']: 3,
-        ['size-z']: 3,
+        ['size-x']: 5,
+        ['size-y']: 1,
+        ['size-z']: 1,
         ['algorithm']: 'diffusion_1',
         ['diffusion']: 50,
         ['checkbox-group']: ['A', 'B'],

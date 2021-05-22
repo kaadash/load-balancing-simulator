@@ -1,59 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar'
 import {
-  Form,
-  Select,
-  InputNumber,
-  Switch,
   Radio,
-  Slider,
   Table
 } from 'antd';
-
-import { flatten } from 'lodash';
-
-const formItemLayout = {
-  labelCol: {
-    span: 6,
-  },
-  wrapperCol: {
-    span: 14,
-  },
-};
-
-const data = [
-  {
-    "country": "AD",
-    "hot dog": 50,
-    "burger": 41,
-    "sandwich": 133,
-    "kebab": 45,
-    "fries": 110,
-    "donut": 153,
-  },
-]
-
-
-const columns = [
-  { title: 'Column 1', dataIndex: 'address', key: '1' },
-
-  {
-    title: 'Action',
-    key: 'operation',
-    fixed: 'right',
-    width: 100,
-    render: () => <a>Apply changes</a>,
-  },
-];
-
-const dataTable = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York Park',
-  },
-];
 
 export const CurrentLoadTab = (props) => {
   const [chartKeys, setChartKeys] = useState([]);

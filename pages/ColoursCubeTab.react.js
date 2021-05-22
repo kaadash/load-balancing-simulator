@@ -24,6 +24,7 @@ export default (props) => {
       topology3DView.updateProcessors(props.processors);
       topology3DView.removeAll();
       topology3DView.renderSpheres();
+      topology3DView.renderLines();
     }
   }, [props.processors])
 
