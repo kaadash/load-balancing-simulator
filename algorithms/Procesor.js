@@ -1,6 +1,7 @@
 export default class {
     constructor({
         neighbours,
+        index,
         id,
         x,
         y,
@@ -12,6 +13,7 @@ export default class {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.index = index;
         this.currentLoad = currentLoad;
         this.loadToTransfer = 0;
     }

@@ -2,34 +2,60 @@ import React, { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar'
 import {
   Radio,
-  Table
+  Table,
+  Modal,
+  Button,
+  InputNumber,
 } from 'antd';
 
 export const CurrentLoadTab = (props) => {
   const [chartKeys, setChartKeys] = useState([]);
   const [chartValues, setChartValues] = useState([]);
+  const [editOpened, setEditOpened] = useState(false);
+  const [processorToEdit, setProcessorToEdit] = useState(null);
+  
   const [tableHeader, setTableHeader] = useState([
     { title: 'Processor ID', dataIndex: 'id', key: '1' },
     { title: 'Current load', dataIndex: 'currentLoad', key: '2' },
     {
       title: 'Action',
-      key: 'operation',
+      key: 'key',
       fixed: 'right',
       width: 200,
-      render: () => <a>Change current load</a>,
+      render: (_, record) => <div onClick={() => openEditPopup(record)}>Change current load</div>,
     },
   ]);
+  const openEditPopup = (processor) => {
+    console.log('test', processor);
+    setProcessorToEdit({...processor});
+    setEditOpened(true);
+  }
+  const handleCancel = () => {
+    setEditOpened(false);
+  }
+  const handleOk = () => {
+    setEditOpened(false);
+    props.onChangeProcessor(processorToEdit);
+    setProcessorToEdit(null);
+
+  }
+  const onChangeProcessorTasks = (value) => {
+    setProcessorToEdit({
+      ...processorToEdit,
+      currentLoad: value
+    })
+  }
   const [tableData, setTableData] = useState([]);
   useEffect(() => {
     setChartKeys((props.processors || []).map(processor => processor.id));
     setChartValues([(props.processors || []).reduce((acc, processor) => {
-      acc[processor.id] = processor.currentLoad;
+      acc[processor.id] = Math.floor(processor.currentLoad);
       return acc;
     }, {})]);
     setTableData((props.processors || []).map((processor) => {
       return {
         id: processor.id,
-        currentLoad: processor.currentLoad,
+        currentLoad: Math.floor(processor.currentLoad),
       }
     }));
   }, [props.processors]);
@@ -68,6 +94,22 @@ export const CurrentLoadTab = (props) => {
           motionDamping={15}
         />
       </div>
+      <Modal
+        visible={editOpened}
+        title="Edit process number of task"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Return
+            </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Submit
+            </Button>,
+        ]}
+      >
+        <InputNumber onChange={onChangeProcessorTasks} value={processorToEdit ? processorToEdit.currentLoad : 0 }/>
+      </Modal>
     </div>
   )
 }

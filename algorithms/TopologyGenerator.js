@@ -21,6 +21,7 @@ export const generateTopology = (x = 1, y = 1, z = 1, maxTasks = 1000) => {
                     x: xId,
                     y: yId,
                     z: zId,
+                    index: processors.length,
                     currentLoad: Math.floor(Math.random() * maxTasks)
                 });
                 processors.push(currentProcessor);

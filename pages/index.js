@@ -12,7 +12,8 @@ const { Header, Footer, Content } = Layout;
 const { TabPane } = Tabs;
 import React, { useEffect, useState } from 'react';
 import { generateTopology } from '../algorithms/TopologyGenerator';
-import { diffusionSync } from '../algorithms/diffustionSync';
+import { diffusionSync } from '../algorithms/diffussionSync';
+import { diffusionAsync } from '../algorithms/diffussionAsync';
 import 'three';
 
 
@@ -21,49 +22,80 @@ export default function Home() {
   const [started, setStarted] = useState(false);
   const [allProcesors, setAllProcessors] = useState(generateTopology(topologySize.x, topologySize.y, topologySize.z));
   const [history, setHistory] = useState([]);
+  const [diffusion, setDiffusion] = useState(50);
+  const [speed, setSpeed] = useState(100);
+  const [algorithmKey, setAlgorithm] = useState('diffusion_sync');
   const sumOfTasks = allProcesors.reduce((acc, processor) => {
     acc += processor.currentLoad
     return acc;
   }, 0);
   const avgTasks = Math.floor(sumOfTasks / allProcesors.length);
+  let timeout = null;
+
   // ASYNC DIFFUSION
-  const diffusion = 1;
   useEffect(() => {
-    let interval = null;
-    setTimeout(() => {
-      const newProcessors = diffusionSync(allProcesors, diffusion);
-      setAllProcessors(newProcessors);
-    }, 1000);
     if (started) {
-      clearTimeout(interval);
+      const algorithm = pickAlgorithm(algorithmKey);
+      timeout = setTimeout(() => {
+        const newProcessors = algorithm(allProcesors, diffusion / 100);
+        setAllProcessors(newProcessors);
+      }, 10000 / speed);
     } else {
+      clearTimeout(timeout);
     }
-  }, [allProcesors])
+  }, [started, allProcesors])
 
   useEffect(() => {
     setHistory([...history, allProcesors]);
-    console.log(history);
   }, [allProcesors])
 
-  const onStartSimulation = (started, formData) => {
-    // setStarted(started);
+  const onStartSimulation = (started) => {
+    setStarted(started);
   }
   const getFormValue = (formValues, key) => {
     return formValues.find(({ name }) => name[0] === key).value;
   }
 
+  const pickAlgorithm = (algorithmKey) => {
+    switch (algorithmKey) {
+      case 'diffusion_sync':
+        return diffusionSync;
+      case 'diffusion_async':
+        return diffusionAsync;
+    
+      default:
+        break;
+    }
+  }
+
 
   const onChangeValues = (value) => {
-
     const topology = {
       x: +getFormValue(value, 'size-x'),
       y: +getFormValue(value, 'size-y'),
       z: +getFormValue(value, 'size-z'),
     }
     setTopologySize(topology);
-
-    setAllProcessors(generateTopology(topologySize.x, topologySize.y, topologySize.z));
+    setAlgorithm(getFormValue(value, 'algorithm'))
+    setDiffusion(getFormValue(value, 'diffusion'))
+    setSpeed(getFormValue(value, 'speed'))
+    if (topology.x !== topologySize.x || topology.y !== topologySize.y || topology.z !== topologySize.z) {
+      setAllProcessors(generateTopology(topologySize.x, topologySize.y, topologySize.z));
+    }
   }
+
+  const onChangeProcessor = (processorToEdit) => {
+    setAllProcessors(allProcesors.map((processor) => {
+      if (processorToEdit.id === processor.id) {
+        return {
+          ...processor,
+          currentLoad: processorToEdit.currentLoad
+        }
+      }
+      return processor;
+    }))
+  }
+
 
   return (
     <Layout>
@@ -75,7 +107,8 @@ export default function Home() {
       <Content>
         <div className={styles.container}>
           <Card>
-            <Controls onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
+            <Controls  onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
+            <h3>{sumOfTasks} : {avgTasks}</h3>
           </Card>
         </div>
       </Content>
@@ -84,7 +117,7 @@ export default function Home() {
           <Card>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Current Load" key="1">
-                <CurrentLoadTab processors={allProcesors} />
+                <CurrentLoadTab processors={allProcesors} onChangeProcessor={onChangeProcessor} />
               </TabPane>
               <TabPane tab="History Load" key="2">
                 <HistoryTab history={history} />

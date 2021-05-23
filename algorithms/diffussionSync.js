@@ -3,7 +3,7 @@ export const diffusionSync = (processors, alpha) => {
   const beta = alpha / maxNeighbours;
   const newProcessors = processors.map((processor) => {
     const valuesToTransfer = processor.neighbours.map((neighbour) => {
-      const toTransfer = Math.floor(alpha * beta * (processor.currentLoad - neighbour.currentLoad));
+      const toTransfer = alpha * beta * (processor.currentLoad - neighbour.currentLoad);
       return toTransfer;
     })
     const currentLoad = processor.currentLoad - valuesToTransfer.reduce((sum, transferValue) => {
