@@ -19,14 +19,22 @@ export default (props) => {
       rootElement.current.innerHTML = '';
     }
   }, [])
+
   useEffect(() => {
     if (topology3DView) {
-      topology3DView.updateProcessors(props.processors);
+      topology3DView.updateProcessors(props.processors, props.maxTasks);
+      topology3DView.changeSpheresColors();
+    }
+  }, [props.processors, props.maxTasks])
+
+  useEffect(() => {
+    if (topology3DView) {
+      topology3DView.updateProcessors(props.processors, props.maxTasks);
       topology3DView.removeAll();
       topology3DView.renderSpheres();
       topology3DView.renderLines();
     }
-  }, [props.processors])
+  }, [props.size])
 
   return (
     <div>

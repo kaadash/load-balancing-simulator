@@ -39,7 +39,7 @@ export default (props) => {
           ['size-z']: 1,
           ['speed']: 100,
           ['algorithm']: 'diffusion_sync',
-          ['diffusion']: 50,
+          ['diffusion']: 80,
         }}
       >
         <Form.Item name="algorithm" label="Algorithm:">

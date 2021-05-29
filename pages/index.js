@@ -22,7 +22,7 @@ export default function Home() {
   const [started, setStarted] = useState(false);
   const [allProcesors, setAllProcessors] = useState(generateTopology(topologySize.x, topologySize.y, topologySize.z));
   const [history, setHistory] = useState([]);
-  const [diffusion, setDiffusion] = useState(50);
+  const [diffusion, setDiffusion] = useState(80);
   const [speed, setSpeed] = useState(100);
   const [algorithmKey, setAlgorithm] = useState('diffusion_sync');
   const sumOfTasks = allProcesors.reduce((acc, processor) => {
@@ -39,7 +39,7 @@ export default function Home() {
       timeout = setTimeout(() => {
         const newProcessors = algorithm(allProcesors, diffusion / 100);
         setAllProcessors(newProcessors);
-      }, 10000 / speed);
+      }, 10500 - (100 * speed));
     } else {
       clearTimeout(timeout);
     }
@@ -62,7 +62,7 @@ export default function Home() {
         return diffusionSync;
       case 'diffusion_async':
         return diffusionAsync;
-    
+
       default:
         break;
     }
@@ -80,20 +80,37 @@ export default function Home() {
     setDiffusion(getFormValue(value, 'diffusion'))
     setSpeed(getFormValue(value, 'speed'))
     if (topology.x !== topologySize.x || topology.y !== topologySize.y || topology.z !== topologySize.z) {
-      setAllProcessors(generateTopology(topologySize.x, topologySize.y, topologySize.z));
+      setAllProcessors(generateTopology(topology.x, topology.y, topology.z));
     }
   }
 
   const onChangeProcessor = (processorToEdit) => {
-    setAllProcessors(allProcesors.map((processor) => {
+    const editedProcessors = allProcesors.map((processor) => {
       if (processorToEdit.id === processor.id) {
         return {
           ...processor,
           currentLoad: processorToEdit.currentLoad
         }
+      } else {
+        return {
+          ...processor,
+          neighbours: processor.neighbours.map((neighbour) => {
+            if (neighbour.id === processorToEdit.id) {
+              return {
+                ...neighbour,
+                currentLoad: processorToEdit.currentLoad 
+              }
+            }
+            return neighbour;
+          }),
+        }
       }
-      return processor;
-    }))
+    })
+    setAllProcessors(editedProcessors);
+  }
+
+  const clearHistory = () => {
+    setHistory([]);
   }
 
 
@@ -107,7 +124,7 @@ export default function Home() {
       <Content>
         <div className={styles.container}>
           <Card>
-            <Controls  onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
+            <Controls onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
             <h3>{sumOfTasks} : {avgTasks}</h3>
           </Card>
         </div>
@@ -120,14 +137,14 @@ export default function Home() {
                 <CurrentLoadTab processors={allProcesors} onChangeProcessor={onChangeProcessor} />
               </TabPane>
               <TabPane tab="History Load" key="2">
-                <HistoryTab history={history} />
+                <HistoryTab onClearHistory={clearHistory} history={history} />
               </TabPane>
               <TabPane tab="Coloured" key="3">
                 <ColoursCubeTab
                   processors={allProcesors}
                   size={topologySize}
                   avgTasks={avgTasks}
-                  maxTasks={1000}
+                  maxTasks={Math.floor(avgTasks * 2)}
                 />
               </TabPane>
             </Tabs>

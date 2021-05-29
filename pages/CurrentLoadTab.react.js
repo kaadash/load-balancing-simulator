@@ -26,7 +26,6 @@ export const CurrentLoadTab = (props) => {
     },
   ]);
   const openEditPopup = (processor) => {
-    console.log('test', processor);
     setProcessorToEdit({...processor});
     setEditOpened(true);
   }
@@ -61,11 +60,6 @@ export const CurrentLoadTab = (props) => {
   }, [props.processors]);
   return (
     <div>
-      <Radio.Group>
-        <Radio.Button value="table">table</Radio.Button>
-        <Radio.Button value="graph">graph</Radio.Button>
-      </Radio.Group>
-
       <div>
         <Table columns={tableHeader} dataSource={tableData} scroll={{ x: 1300 }} />
       </div>
@@ -89,7 +83,7 @@ export const CurrentLoadTab = (props) => {
           labelSkipHeight={12}
           isInteractive={true}
           labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-          animate={true}
+          animate={false}
           motionStiffness={90}
           motionDamping={15}
         />

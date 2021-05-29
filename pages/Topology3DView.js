@@ -53,6 +53,7 @@ export class Topology3DView {
 
     constructor(mountRootElement, processors, maxTasks, size) {
         this.processors = processors;
+        this.spheres = [];
         this.maxTasks = maxTasks;
         this.mountRootElement = mountRootElement;
         this.size = size;
@@ -89,18 +90,27 @@ export class Topology3DView {
         }
     }
 
-    updateProcessors(processors) {
+    updateProcessors(processors, maxTasks) {
         this.processors = processors;
+        this.maxTasks = maxTasks;
+    }
+
+    getNormalizedColor(processorLoad) {
+        const normalizedValue = Math.floor((processorLoad / this.maxTasks) * 100);
+        const h = Math.floor((100 - normalizedValue) * 120 / 100);
+        const s = Math.abs(normalizedValue - 50) / 50;
+        return +`0x${hsv2rgb(h, s, 1)}`;
     }
 
     renderSpheres() {
+        this.spheres = [];
         this.processors.forEach(processor => {
             const normalizedValue = Math.floor((processor.currentLoad / this.maxTasks) * 100);
             const h = Math.floor((100 - normalizedValue) * 120 / 100);
             const s = Math.abs(normalizedValue - 50) / 50;
 
             const geometry = new SphereGeometry(3, 32, 32);
-            const material = new MeshPhongMaterial({ color: +`0x${hsv2rgb(h, s, 1)}` });
+            const material = new MeshPhongMaterial({ color: this.getNormalizedColor(processor.currentLoad) });
             const sphere = new Mesh(geometry, material);
             sphere.userData.processor = processor;
             sphere.position.copy(
@@ -110,8 +120,16 @@ export class Topology3DView {
                     processor.z * this.MULTIPLIER
                 )
             );
+            this.spheres.push(sphere);
             this.scene.add(sphere);
         })
+    }
+    changeSpheresColors() {
+        if (this.spheres.length === this.processors.length) {
+            this.spheres.forEach((sphere, index) => {
+                sphere.material.color.set(this.getNormalizedColor(this.processors[index].currentLoad));
+            })
+        }
     }
 
     renderLines() {
@@ -184,7 +202,7 @@ export class Topology3DView {
             const currentIntersected = intersects[0].object;
             if (currentIntersected && currentIntersected.userData && currentIntersected.userData.processor && currentIntersected.userData.processor.id) {
                 if (currentIntersected.userData.processor.id !== this.prevIntersectedId) {
-                    console.log(currentIntersected.userData.processor.id, this.prevIntersectedId);
+                    // console.log(currentIntersected.userData.processor.id, this.prevIntersectedId);
                     this.prevIntersectedId = currentIntersected.userData.processor.id;
                     // setProcessorTooltip({
                     //     id: currentIntersected.userData.processor.id,
