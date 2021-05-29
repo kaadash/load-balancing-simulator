@@ -14,6 +14,8 @@ import React, { useEffect, useState } from 'react';
 import { generateTopology } from '../algorithms/TopologyGenerator';
 import { diffusionSync } from '../algorithms/diffussionSync';
 import { diffusionAsync } from '../algorithms/diffussionAsync';
+import { NNAAsync } from '../algorithms/NNAAsync';
+import { NNASync } from '../algorithms/NNASync';
 import 'three';
 
 
@@ -62,6 +64,10 @@ export default function Home() {
         return diffusionSync;
       case 'diffusion_async':
         return diffusionAsync;
+      case 'nna_async':
+        return NNAAsync;
+      case 'nna_sync':
+        return NNASync;
 
       default:
         break;
@@ -125,7 +131,7 @@ export default function Home() {
         <div className={styles.container}>
           <Card>
             <Controls onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
-            <h3>{sumOfTasks} : {avgTasks}</h3>
+            <h3>{Math.floor(sumOfTasks)} : {avgTasks}</h3>
           </Card>
         </div>
       </Content>
