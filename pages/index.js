@@ -1,9 +1,9 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import Controls from "./Controls.react";
-import HistoryTab from "./HistoryTab.react";
-import ColoursCubeTab from "./ColoursCubeTab.react";
-import CurrentLoadTab from "./CurrentLoadTab.react";
+import Controls from "../components/Controls.react";
+import HistoryTab from "../components/HistoryTab.react";
+import ColoursCubeTab from "../components/ColoursCubeTab.react";
+import CurrentLoadTab from "../components/CurrentLoadTab.react";
 import { Tabs } from 'antd';
 import 'antd/dist/antd.css';
 import { Layout } from 'antd';
