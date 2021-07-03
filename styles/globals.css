@@ -18,3 +18,19 @@ a {
 .ant-table-cell {
   white-space: nowrap;
 }
+
+.row {
+  display: flex;
+}
+
+.gradient-legend {
+  max-width: 80px;
+}
+
+.gradient-column {
+  height: 500px;
+  width: 60px;
+  min-width: 60px;
+  background: rgb(0,50,255);
+  background: linear-gradient(0deg, rgba(0,50,255,1) 0%, rgba(1,255,4,1) 50%, rgba(255,0,0,1) 100%);
+}

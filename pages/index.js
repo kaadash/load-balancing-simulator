@@ -131,7 +131,6 @@ export default function Home() {
         <div className={styles.container}>
           <Card>
             <Controls onStart={onStartSimulation} onChangeValues={onChangeValues} started={started} />
-            <h3>{Math.floor(sumOfTasks)} : {avgTasks}</h3>
           </Card>
         </div>
       </Content>
@@ -142,8 +141,8 @@ export default function Home() {
               <TabPane tab="Current Load" key="1">
                 <CurrentLoadTab processors={allProcesors} onChangeProcessor={onChangeProcessor} />
               </TabPane>
-              <TabPane tab="History Load" key="2">
-                <HistoryTab onClearHistory={clearHistory} history={history} />
+              <TabPane tab="Load history" key="2">
+                <HistoryTab onClearHistory={clearHistory} history={history} processors={allProcesors} />
               </TabPane>
               <TabPane tab="Coloured" key="3">
                 <ColoursCubeTab

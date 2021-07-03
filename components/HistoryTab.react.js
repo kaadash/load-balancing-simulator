@@ -1,54 +1,105 @@
 import React, { useEffect, useState } from 'react';
-import { ResponsiveBar } from '@nivo/bar'
-import { Pagination, Button } from 'antd';
+import { BarCanvas } from '@nivo/bar'
+import { Pagination, Button, Select } from 'antd';
+
+const { Option } = Select;
 
 export const HistoryTab = (props) => {
   const [currentStateIndex, setCurrentStateIndex] = useState(0);
   const [currentProcessorsState, setCurrentProcessorsState] = useState(null);
-  const [chartKeys, setChartKeys] = useState([]);
   const [chartValues, setChartValues] = useState([]);
+  const [selectedProcessor, setSelectedProcessor] = useState(null);
+  const [selectedProcessorHistory, setSelectedProcessorHistory] = useState([]);
 
   const onChange = (value) => {
     setCurrentStateIndex(value - 1);
     setCurrentProcessorsState(props.history[value - 1])
   };
 
+  const handleChangeProcessor = (processor) => {
+    setSelectedProcessor(processor);
+    const processorHistory = (props.history || []).map((historyItem, index) => {
+      const processorFromHistory = historyItem.find(({ id }) => id === processor);
+      return {
+        id: index,
+        processor: index,
+        load: processorFromHistory.currentLoad,
+      }
+    })
+    console.log(processorHistory);
+    setSelectedProcessorHistory(processorHistory);
+  };
+
+  const renderOptions = () => {
+    return (props.processors || []).map((processor) => {
+      return <Option value={processor.id}>{processor.id}</Option>
+    });
+  }
+
   useEffect(() => {
-    setChartKeys((currentProcessorsState || []).map(processor => processor.id));
-    setChartValues([(currentProcessorsState || []).reduce((acc, processor) => {
-      acc[processor.id] = Math.floor(processor.currentLoad);
-      return acc;
-    }, {})]);
+    setChartValues(
+      (currentProcessorsState || [])
+        .map((processor) => {
+          return {
+            id: processor.id,
+            processor: processor.id,
+            load: processor.currentLoad,
+          };
+        })
+    );
   }, [currentProcessorsState]);
 
   return (
     <div>
       {props.history && props.history.length ? (
         <div>
+          <div>
+            <p>Select processor to check its history</p>
+            <Select   style={{ width: 120 }} onChange={handleChangeProcessor}>
+              {renderOptions()}
+            </Select>
+          </div>
           <Pagination pageSize={1} current={currentStateIndex + 1} total={props.history.length} onChange={onChange} />
-          <div style={{ height: '300px', width: '1300px', }}>
-            <ResponsiveBar
-              data={chartValues}
-              groupMode="grouped"
-              keys={chartKeys}
-              margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-              colors={{ scheme: 'nivo' }}
-              axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'load',
-                legendPosition: 'middle',
-                legendOffset: -40
-              }}
-              labelSkipWidth={12}
-              labelSkipHeight={12}
-              isInteractive={true}
-              labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              animate={false}
-              motionStiffness={90}
-              motionDamping={15}
-            />
+          <div>
+            {
+              selectedProcessor ? (
+                <BarCanvas
+                  data={selectedProcessorHistory}
+                  keys={["load"]}
+                  axisLeft={{
+                    legend: "Current Load",
+                    legendPosition: "middle",
+                    legendOffset: -40,
+                  }}
+                  margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+                  labelSkipWidth={0}
+                  labelSkipHeight={0}
+                  isInteractive={true}
+                  width={1250}
+                  height={300}
+                  labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
+                  animate={false}
+                />
+              ) : (
+                <BarCanvas
+                  data={chartValues}
+                  keys={["load"]}
+                  axisLeft={{
+                    legend: "Current Load",
+                    legendPosition: "middle",
+                    legendOffset: -40,
+                  }}
+                  margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+                  labelSkipWidth={0}
+                  labelSkipHeight={0}
+                  isInteractive={true}
+                  width={1250}
+                  height={300}
+                  labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
+                  animate={false}
+                />
+              )
+            }
           </div>
           <Button onClick={props.onClearHistory}>Clear History</Button>
         </div>

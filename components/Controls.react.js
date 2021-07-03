@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-  Form,
-  InputNumber,
-  Switch,
-  Radio,
-  Slider,
-} from 'antd';
+import React from "react";
+import { Form, InputNumber, Button, Radio, Slider, Affix } from "antd";
 const formItemLayout = {
   labelCol: {
     span: 6,
@@ -20,11 +14,11 @@ export default (props) => {
 
   const onStart = (selected) => {
     props.onStart(selected, formData.getFieldsValue());
-  }
+  };
 
   const onChange = (event, value) => {
     props.onChangeValues(value);
-  }
+  };
 
   return (
     <div>
@@ -34,12 +28,12 @@ export default (props) => {
         name="validate_other"
         {...formItemLayout}
         initialValues={{
-          ['size-x']: 5,
-          ['size-y']: 1,
-          ['size-z']: 1,
-          ['speed']: 100,
-          ['algorithm']: 'diffusion_sync',
-          ['diffusion']: 80,
+          ["size-x"]: 5,
+          ["size-y"]: 1,
+          ["size-z"]: 1,
+          ["speed"]: 100,
+          ["algorithm"]: "diffusion_sync",
+          ["diffusion"]: 80,
         }}
       >
         <Form.Item name="algorithm" label="Algorithm:">
@@ -70,8 +64,8 @@ export default (props) => {
           <Slider
             disabled={props.started}
             marks={{
-              0: '0',
-              100: '0.99',
+              0: "0",
+              100: "0.99",
             }}
           />
         </Form.Item>
@@ -79,13 +73,17 @@ export default (props) => {
           <Slider
             disabled={props.started}
             marks={{
-              1: '1',
-              100: '100',
+              1: "1",
+              100: "100",
             }}
           />
         </Form.Item>
       </Form>
-      <Switch onChange={(selected) => onStart(selected)} />
+      <Affix offsetTop={10}>
+        <Button type="primary" block onClick={() => onStart(!props.started)}>
+          {props.started ? "SIMULATION IS RUNNING... CLICK TO STOP SIMULATION" : "START SIMULATION"}
+        </Button>
+      </Affix>
     </div>
   );
 };
