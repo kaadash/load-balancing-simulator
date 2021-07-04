@@ -139,7 +139,7 @@ export default function Home() {
           <Card>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Current Load" key="1">
-                <CurrentLoadTab processors={allProcesors} onChangeProcessor={onChangeProcessor} />
+                <CurrentLoadTab processors={allProcesors} started={started} onChangeProcessor={onChangeProcessor} />
               </TabPane>
               <TabPane tab="Load history" key="2">
                 <HistoryTab onClearHistory={clearHistory} history={history} processors={allProcesors} />

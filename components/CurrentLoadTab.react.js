@@ -1,55 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { BarCanvas } from "@nivo/bar";
-import { Radio, Table, Modal, Button, InputNumber } from "antd";
+import { Divider, Table, Modal, Button, InputNumber } from "antd";
 
 export const CurrentLoadTab = (props) => {
-  const [chartKeys, setChartKeys] = useState([]);
   const [chartValues, setChartValues] = useState([]);
-  const [editOpened, setEditOpened] = useState(false);
-  const [processorToEdit, setProcessorToEdit] = useState(null);
+
+  const onChangeLoad = (load, processor) => {
+    console.log("onChangeLoad", load, processor);
+    props.onChangeProcessor({
+      ...processor,
+      currentLoad: load,
+    });
+  };
 
   const tableHeader = [
     { title: "Processor ID", dataIndex: "id", key: "1" },
-    { title: "Current load", dataIndex: "currentLoad", key: "2" },
+    {
+      title: "Current load",
+      dataIndex: "currentLoad",
+      key: "2",
+      render: (currentLoad, processor) => {
+        return (
+          <InputNumber
+            min={0}
+            value={currentLoad}
+            disabled={props.started}
+            defaultValue={currentLoad}
+            onChange={(load) => onChangeLoad(load, processor)}
+          />
+        );
+      },
+    },
     {
       title: "Action",
       key: "key",
       fixed: "right",
       width: 200,
       render: (_, record) => (
-        <div onClick={() => openEditPopup(record)}>Change current load</div>
+        <Button disabled={props.started} onClick={() => clearTasks(record)}>Clear</Button>
       ),
     },
   ];
-  const openEditPopup = (processor) => {
-    setProcessorToEdit({ ...processor });
-    setEditOpened(true);
-  };
-  const handleCancel = () => {
-    setEditOpened(false);
-  };
-  const handleOk = () => {
-    setEditOpened(false);
-    props.onChangeProcessor(processorToEdit);
-    setProcessorToEdit(null);
-  };
-  const onChangeProcessorTasks = (value) => {
-    setProcessorToEdit({
-      ...processorToEdit,
-      currentLoad: value,
+  const clearTasks = (processor) => {
+    props.onChangeProcessor({
+      ...processor,
+      currentLoad: 0,
     });
   };
   const [tableData, setTableData] = useState([]);
   useEffect(() => {
     setChartValues(
-      (props.processors || [])
-        .map((processor) => {
-          return {
-            id: processor.id,
-            processor: processor.id,
-            load: processor.currentLoad,
-          };
-        })
+      (props.processors || []).map((processor) => {
+        return {
+          id: processor.id,
+          processor: processor.id,
+          load: processor.currentLoad,
+        };
+      })
     );
     setTableData(
       (props.processors || []).map((processor) => {
@@ -61,7 +68,6 @@ export const CurrentLoadTab = (props) => {
       })
     );
   }, [props.processors]);
-  console.log(chartValues);
   return (
     <div>
       <div>
@@ -72,6 +78,7 @@ export const CurrentLoadTab = (props) => {
         />
       </div>
       <div>
+        <Divider>Processor Load Histogram</Divider>
         <BarCanvas
           data={chartValues}
           keys={["load"]}
@@ -90,25 +97,6 @@ export const CurrentLoadTab = (props) => {
           animate={false}
         />
       </div>
-      <Modal
-        visible={editOpened}
-        title="Edit process number of task"
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Return
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            Submit
-          </Button>,
-        ]}
-      >
-        <InputNumber
-          onChange={onChangeProcessorTasks}
-          value={processorToEdit ? processorToEdit.currentLoad : 0}
-        />
-      </Modal>
     </div>
   );
 };

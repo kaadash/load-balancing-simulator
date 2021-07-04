@@ -45,9 +45,9 @@ export default (props) => {
     <div>
       <div className="row">
         <div className="gradient-legend">
-          <p>load under average</p>
-          <div className="gradient-column"></div>
           <p>load over average</p>
+          <div className="gradient-column"></div>
+          <p>load under average</p>
         </div>
         <div className={styles.colorCubesContainer} ref={rootElement}></div>
       </div>

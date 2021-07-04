@@ -80,8 +80,15 @@ export default (props) => {
         </Form.Item>
       </Form>
       <Affix offsetTop={10}>
-        <Button type="primary" block onClick={() => onStart(!props.started)}>
-          {props.started ? "SIMULATION IS RUNNING... CLICK TO STOP SIMULATION" : "START SIMULATION"}
+        <Button
+          type="primary"
+          danger={props.started}
+          block
+          onClick={() => onStart(!props.started)}
+        >
+          {props.started
+            ? "SIMULATION IS RUNNING... CLICK TO STOP SIMULATION"
+            : "START SIMULATION"}
         </Button>
       </Affix>
     </div>
