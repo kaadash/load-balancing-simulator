@@ -22,7 +22,8 @@ export const generateTopology = (x = 1, y = 1, z = 1, maxTasks = 1000) => {
                     y: yId,
                     z: zId,
                     index: processors.length,
-                    currentLoad: Math.floor(Math.random() * maxTasks)
+                    currentLoad: Math.floor(Math.random() * maxTasks),
+                    range: 0
                 });
                 processors.push(currentProcessor);
                 if (xId > 0) {
@@ -43,5 +44,6 @@ export const generateTopology = (x = 1, y = 1, z = 1, maxTasks = 1000) => {
             })
         })    
     })
+    console.log('processors', processors);
     return processors;
 }

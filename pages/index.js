@@ -39,7 +39,8 @@ export default function Home() {
     if (started) {
       const algorithm = pickAlgorithm(algorithmKey);
       timeout = setTimeout(() => {
-        const newProcessors = algorithm(allProcesors, diffusion / 100);
+        const processorsAfterRandomLoadChange = randomRange(allProcesors);
+        const newProcessors = algorithm(processorsAfterRandomLoadChange, diffusion / 100);
         setAllProcessors(newProcessors);
       }, 10500 - (100 * speed));
     } else {
@@ -50,6 +51,35 @@ export default function Home() {
   useEffect(() => {
     setHistory([...history, allProcesors]);
   }, [allProcesors])
+
+  const randomRange = (processors) => {
+    const newProcessors = processors.map((processor) => {
+      if (processor.range) {
+        const sign = Math.round(Math.random()) ? 1 : -1;
+        const currentLoad = processor.currentLoad + (sign * Math.random() * processor.range);
+        return {
+          ...processor,
+          currentLoad
+        }
+      }
+      return processor;
+    })
+    const newProcessorsWithNeighbours = newProcessors.map((processor) => {
+      const updatedNeighbours = processor.neighbours.map((neighbour) => {
+        const updatedNeighbour = newProcessors.find(({ id }) => id === neighbour.id);
+        return {
+          ...neighbour,
+          currentLoad: updatedNeighbour.currentLoad
+        };
+      });
+      return {
+        ...processor,
+        neighbours: updatedNeighbours
+      }
+    })
+    return newProcessorsWithNeighbours;
+
+  }
 
   const onStartSimulation = (started) => {
     setStarted(started);
@@ -95,7 +125,8 @@ export default function Home() {
       if (processorToEdit.id === processor.id) {
         return {
           ...processor,
-          currentLoad: processorToEdit.currentLoad
+          currentLoad: processorToEdit.currentLoad,
+          range: processorToEdit.range || 0,
         }
       } else {
         return {
@@ -104,7 +135,8 @@ export default function Home() {
             if (neighbour.id === processorToEdit.id) {
               return {
                 ...neighbour,
-                currentLoad: processorToEdit.currentLoad 
+                currentLoad: processorToEdit.currentLoad,
+                range: processorToEdit.range || 0,
               }
             }
             return neighbour;

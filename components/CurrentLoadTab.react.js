@@ -6,10 +6,15 @@ export const CurrentLoadTab = (props) => {
   const [chartValues, setChartValues] = useState([]);
 
   const onChangeLoad = (load, processor) => {
-    console.log("onChangeLoad", load, processor);
     props.onChangeProcessor({
       ...processor,
       currentLoad: load,
+    });
+  };
+  const onChangeRange = (range, processor) => {
+    props.onChangeProcessor({
+      ...processor,
+      range
     });
   };
 
@@ -27,6 +32,22 @@ export const CurrentLoadTab = (props) => {
             disabled={props.started}
             defaultValue={currentLoad}
             onChange={(load) => onChangeLoad(load, processor)}
+          />
+        );
+      },
+    },
+    {
+      title: "Range",
+      dataIndex: "range",
+      key: "3",
+      render: (range, processor) => {
+        return (
+          <InputNumber
+            min={0}
+            value={range}
+            disabled={props.started}
+            defaultValue={range}
+            onChange={(range) => onChangeRange(range, processor)}
           />
         );
       },
@@ -60,10 +81,12 @@ export const CurrentLoadTab = (props) => {
     );
     setTableData(
       (props.processors || []).map((processor) => {
+        console.log(processor);
         return {
           id: processor.id,
           key: processor.id,
           currentLoad: Math.floor(processor.currentLoad),
+          range: processor.range,
         };
       })
     );

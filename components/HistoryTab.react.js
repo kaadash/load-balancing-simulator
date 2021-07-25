@@ -25,7 +25,7 @@ export const HistoryTab = (props) => {
         return {
           id: index,
           processor: index,
-          load: processorFromHistory.currentLoad,
+          load: Math.floor(processorFromHistory.currentLoad),
         };
       }
       return null;
@@ -49,7 +49,7 @@ export const HistoryTab = (props) => {
         return {
           id: processor.id,
           processor: processor.id,
-          load: processor.currentLoad,
+          load: Math.floor(processor.currentLoad),
         };
       })
     );

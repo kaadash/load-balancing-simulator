@@ -7,6 +7,7 @@ export default class {
         y,
         z,
         currentLoad,
+        range,
     }) {
         this.neighbours = neighbours;
         this.id = id;
@@ -15,6 +16,7 @@ export default class {
         this.z = z;
         this.index = index;
         this.currentLoad = currentLoad;
+        this.range = range;
         this.loadToTransfer = 0;
     }
 
