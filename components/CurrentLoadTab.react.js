@@ -81,7 +81,6 @@ export const CurrentLoadTab = (props) => {
     );
     setTableData(
       (props.processors || []).map((processor) => {
-        console.log(processor);
         return {
           id: processor.id,
           key: processor.id,
@@ -91,6 +90,9 @@ export const CurrentLoadTab = (props) => {
       })
     );
   }, [props.processors]);
+
+  console.log('CurrentLoadTab');
+
   return (
     <div>
       <div>

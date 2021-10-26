@@ -3,6 +3,7 @@ import {
     PerspectiveCamera,
     WebGLRenderer,
     SphereGeometry,
+    BoxGeometry,
     MeshPhongMaterial,
     Mesh,
     LineBasicMaterial,
@@ -28,7 +29,9 @@ function hslToHex(h, s, l) {
 export class Topology3DView {
 
     constructor(mountRootElement, processors, maxTasks, size) {
+        window.frames = [];
         this.processors = processors;
+        this.start = null;
         this.spheres = [];
         this.maxTasks = maxTasks;
         this.mountRootElement = mountRootElement;
@@ -47,7 +50,6 @@ export class Topology3DView {
         this.renderSpheres();
         this.renderLines();
 
-        this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
 
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -109,9 +111,11 @@ export class Topology3DView {
         this.spheres = [];
         this.processors.forEach(processor => {
 
-            const geometry = new SphereGeometry(3, 32, 32);
+            // const geometry = new SphereGeometry(3, 32, 32);
+            const geometry = new BoxGeometry(5, 5, 5);
             const material = new MeshPhongMaterial({ color: this.getNormalizedColor(processor.currentLoad) });
             const sphere = new Mesh(geometry, material);
+            console.log(sphere.geometry.vertices.length);
             sphere.userData.processor = processor;
             sphere.position.copy(
                 new Vector3(
@@ -191,26 +195,16 @@ export class Topology3DView {
     }
 
 
-    render() {
+    render(timestamp) {
+        console.log('render', this.renderer.info.render);
         requestAnimationFrame(this.render.bind(this));
 
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        const intersects = this.raycaster.intersectObjects(this.scene.children);
-
-        if (intersects.length > 0) {
-            const currentIntersected = intersects[0].object;
-            if (currentIntersected && currentIntersected.userData && currentIntersected.userData.processor && currentIntersected.userData.processor.id) {
-                if (currentIntersected.userData.processor.id !== this.prevIntersectedId) {
-                    // console.log(currentIntersected.userData.processor.id, this.prevIntersectedId);
-                    this.prevIntersectedId = currentIntersected.userData.processor.id;
-                    // setProcessorTooltip({
-                    //     id: currentIntersected.userData.processor.id,
-                    //     currentLoad: currentIntersected.userData.processor.currentLoad
-                    // })
-                }
-            }
+        if (this.start && timestamp) {
+            var progress = timestamp - this.start;
+            window.frames.push(progress);
         }
+        this.start = timestamp;
+        
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }

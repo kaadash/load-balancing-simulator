@@ -44,6 +44,5 @@ export const generateTopology = (x = 1, y = 1, z = 1, maxTasks = 1000) => {
             })
         })    
     })
-    console.log('processors', processors);
     return processors;
 }
