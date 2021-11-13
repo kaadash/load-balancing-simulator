@@ -13,9 +13,13 @@ const updateOtherProcessorNeighbours = (processors, processorToEdit) => {
 }
 
 export const NNASync = (processors) => {
+  const diffs = [];
   processors.forEach((processor) => {
     const toTransfer = processor.currentLoad / (processor.neighbours.length + 1);
-
+    diffs.push(toTransfer);
+  })
+  processors.forEach((processor, index) => {
+    const toTransfer = diffs[index];
     processor.neighbours.forEach((neighbour) => {
       neighbour.currentLoad += toTransfer;
       processor.currentLoad -= toTransfer;

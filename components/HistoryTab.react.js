@@ -61,8 +61,6 @@ export const HistoryTab = (props) => {
     }
   }, [props.history, selectedProcessor]);
 
-  console.log('HistoryTab');
-
   return (
     <div>
       {props.history && props.history.length ? (

@@ -91,8 +91,6 @@ export const CurrentLoadTab = (props) => {
     );
   }, [props.processors]);
 
-  console.log('CurrentLoadTab');
-
   return (
     <div>
       <div>

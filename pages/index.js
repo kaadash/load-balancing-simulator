@@ -18,8 +18,16 @@ import { NNAAsync } from "../algorithms/NNAAsync";
 import { NNASync } from "../algorithms/NNASync";
 import "three";
 
+if (typeof window !== "undefined") {
+  window.historyValues = {
+    0: [],
+    1: [],
+    2: [],
+  };
+}
+
 export default function Home() {
-  const [topologySize, setTopologySize] = useState({ x: 5, y: 5, z: 5 });
+  const [topologySize, setTopologySize] = useState({ x: 3, y: 1, z: 1 });
   const [started, setStarted] = useState(false);
   const [allProcesors, setAllProcessors] = useState(
     generateTopology(topologySize.x, topologySize.y, topologySize.z)
@@ -45,6 +53,12 @@ export default function Home() {
           processorsAfterRandomLoadChange,
           diffusion / 100
         );
+        if (typeof window !== "undefined") {
+          console.log('newProcessors', newProcessors);
+          window.historyValues[0].push(Math.floor(newProcessors[0].currentLoad));
+          window.historyValues[1].push(Math.floor(newProcessors[1].currentLoad));
+          window.historyValues[2].push(Math.floor(newProcessors[2].currentLoad));
+        }
         setAllProcessors(newProcessors);
       }, 10500 - 100 * speed);
     } else {
@@ -190,7 +204,7 @@ export default function Home() {
       <Content>
         <div className={styles.container}>
           <Card>
-            <Tabs defaultActiveKey="3">
+            <Tabs defaultActiveKey="1">
               <TabPane tab="Current Load" key="1">
                 <CurrentLoadTab
                   processors={allProcesors}

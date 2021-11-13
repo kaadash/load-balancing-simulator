@@ -43,8 +43,6 @@ export default (props) => {
     }
   }, [props.size]);
 
-  console.log('ColoursCubeTab');
-
   return (
     <div>
       <div className="row">
