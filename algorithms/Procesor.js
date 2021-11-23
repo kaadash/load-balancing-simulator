@@ -35,5 +35,6 @@ export default class {
                 currentLoad: updatedNeighbour.currentLoad
             };
         });
+        return this.neighbours;
     }
 }

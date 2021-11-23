@@ -27,7 +27,7 @@ export default (props) => {
 
   useEffect(() => {
     if (topology3DView) {
-      console.log('props.processors, props.maxTasks', props.processors, props.maxTasks);
+      // console.log('props.processors, props.maxTasks', props.processors, props.maxTasks);
       topology3DView.updateProcessors(props.processors, props.maxTasks);
       topology3DView.changeSpheresColors();
     }
@@ -35,7 +35,6 @@ export default (props) => {
 
   useEffect(() => {
     if (topology3DView) {
-      console.log('props.size', props.size);
       topology3DView.updateProcessors(props.processors, props.maxTasks);
       topology3DView.removeAll();
       topology3DView.renderSpheres();

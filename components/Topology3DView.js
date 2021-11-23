@@ -196,12 +196,15 @@ export class Topology3DView {
 
 
     render(timestamp) {
-        // console.log('render', this.renderer.info.render);
+        // console.log('render', this.renderer.info.render.triangles);
         requestAnimationFrame(this.render.bind(this));
 
         if (this.start && timestamp) {
             var progress = timestamp - this.start;
-            window.frames.push(progress);
+            window.frames.push({
+                triangles: this.renderer.info.render.triangles,
+                time: progress
+            });
         }
         this.start = timestamp;
         

@@ -16,7 +16,23 @@ import { diffusionSync } from "../algorithms/diffussionSync";
 import { diffusionAsync } from "../algorithms/diffussionAsync";
 import { NNAAsync } from "../algorithms/NNAAsync";
 import { NNASync } from "../algorithms/NNASync";
+// import data from './dataCurrent';
+// import data from './historyLoadData';
+import data from './colourCubeData';
+import _ from 'lodash';
 import "three";
+
+
+const grouped = _.groupBy(data, 'processors');
+
+const results = _.map(grouped, (item) => {
+	return {
+    processor: item[0].processors,
+    time: _.sumBy(item, 'time') / item.length
+  };
+})
+
+console.log(results);
 
 if (typeof window !== "undefined") {
   window.historyValues = {
@@ -24,10 +40,13 @@ if (typeof window !== "undefined") {
     1: [],
     2: [],
   };
+  window.indexFrames = [];
 }
 
+let start = null;
+
 export default function Home() {
-  const [topologySize, setTopologySize] = useState({ x: 3, y: 1, z: 1 });
+  const [topologySize, setTopologySize] = useState({ x: 10, y: 10, z: 10 });
   const [started, setStarted] = useState(false);
   const [allProcesors, setAllProcessors] = useState(
     generateTopology(topologySize.x, topologySize.y, topologySize.z)
@@ -54,10 +73,10 @@ export default function Home() {
           diffusion / 100
         );
         if (typeof window !== "undefined") {
-          console.log('newProcessors', newProcessors);
-          window.historyValues[0].push(Math.floor(newProcessors[0].currentLoad));
-          window.historyValues[1].push(Math.floor(newProcessors[1].currentLoad));
-          window.historyValues[2].push(Math.floor(newProcessors[2].currentLoad));
+          // console.log('newProcessors', newProcessors);
+          // window.historyValues[0].push(Math.floor(newProcessors[0].currentLoad));
+          // window.historyValues[1].push(Math.floor(newProcessors[1].currentLoad));
+          // window.historyValues[2].push(Math.floor(newProcessors[2].currentLoad));
         }
         setAllProcessors(newProcessors);
       }, 10500 - 100 * speed);
@@ -66,9 +85,41 @@ export default function Home() {
     }
   }, [started, allProcesors]);
 
+  const [count, setCount] = React.useState(0)
+  
+  // Use useRef for mutable variables that we want to persist
+  // without triggering a re-render on their change
+  const requestRef = React.useRef();
+  const previousTimeRef = React.useRef();
+  
+  const animate = time => {
+    console.log(allProcesors.length);
+    if (previousTimeRef.current != undefined) {
+      const deltaTime = time - previousTimeRef.current;
+      if (started) {
+        window.indexFrames.push({
+          time: deltaTime,
+          processors: allProcesors.length
+        });
+      }
+      // Pass on a function to the setter of the state
+      // to make sure we always have the latest state
+      // setCount(prevCount => (prevCount + deltaTime * 0.01) % 100);
+    }
+    previousTimeRef.current = time;
+    requestRef.current = requestAnimationFrame(animate);
+  }
+  
+  React.useEffect(() => {
+    cancelAnimationFrame(requestRef.current)
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [allProcesors, started]); // Make sure the effect runs only once
+
   useEffect(() => {
     setHistory([...history, allProcesors]);
   }, [allProcesors]);
+
 
   const randomRange = (processors) => {
     const newProcessors = processors.map((processor) => {
@@ -181,7 +232,7 @@ export default function Home() {
   return (
     <Layout>
       <Head>
-        <title>Load balancing simulator</title>
+        <title>Load balancing simulator </title>
         <link rel="icon" href="/favicon.ico" />
         <script
           defer
@@ -204,7 +255,7 @@ export default function Home() {
       <Content>
         <div className={styles.container}>
           <Card>
-            <Tabs defaultActiveKey="1">
+            <Tabs defaultActiveKey="3">
               <TabPane tab="Current Load" key="1">
                 <CurrentLoadTab
                   processors={allProcesors}

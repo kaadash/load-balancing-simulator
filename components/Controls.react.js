@@ -46,17 +46,17 @@ export default (props) => {
         </Form.Item>
         <Form.Item label="Size X:">
           <Form.Item name="size-x" noStyle>
-            <InputNumber disabled={props.started} min={1} max={10} />
+            <InputNumber disabled={props.started} min={1} />
           </Form.Item>
         </Form.Item>
         <Form.Item label="Size Y:">
           <Form.Item name="size-y" noStyle>
-            <InputNumber disabled={props.started} min={1} max={10} />
+            <InputNumber disabled={props.started} min={1} />
           </Form.Item>
         </Form.Item>
         <Form.Item label="Size Z:">
           <Form.Item name="size-z" noStyle>
-            <InputNumber disabled={props.started} min={1} max={10} />
+            <InputNumber disabled={props.started} min={1} />
           </Form.Item>
         </Form.Item>
 
