@@ -20,6 +20,8 @@ export default (props) => {
     props.onChangeValues(value);
   };
 
+  const shouldShowDiff = formData.getFieldValue('algorithm') === 'diffusion_sync' || formData.getFieldValue('algorithm') === 'diffusion_async';
+
   return (
     <div>
       <Form
@@ -59,16 +61,17 @@ export default (props) => {
             <InputNumber disabled={props.started} min={1} />
           </Form.Item>
         </Form.Item>
-
-        <Form.Item name="diffusion" label="diffusion">
-          <Slider
-            disabled={props.started}
-            marks={{
-              0: "0",
-              100: "0.99",
-            }}
-          />
-        </Form.Item>
+        <div style={{display: shouldShowDiff ? 'block' : 'none'}}>
+          <Form.Item name="diffusion" label="diffusion">
+            <Slider
+              disabled={props.started}
+              marks={{
+                0: "0",
+                100: "0.99",
+              }}
+            />
+          </Form.Item>
+        </div>
         <Form.Item name="speed" label="speed">
           <Slider
             disabled={props.started}

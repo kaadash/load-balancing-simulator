@@ -27,7 +27,6 @@ export default (props) => {
 
   useEffect(() => {
     if (topology3DView) {
-      // console.log('props.processors, props.maxTasks', props.processors, props.maxTasks);
       topology3DView.updateProcessors(props.processors, props.maxTasks);
       topology3DView.changeSpheresColors();
     }

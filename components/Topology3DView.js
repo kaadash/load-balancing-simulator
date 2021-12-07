@@ -115,7 +115,6 @@ export class Topology3DView {
             const geometry = new BoxGeometry(5, 5, 5);
             const material = new MeshPhongMaterial({ color: this.getNormalizedColor(processor.currentLoad) });
             const sphere = new Mesh(geometry, material);
-            // console.log(sphere.geometry.vertices.length);
             sphere.userData.processor = processor;
             sphere.position.copy(
                 new Vector3(
@@ -196,7 +195,6 @@ export class Topology3DView {
 
 
     render(timestamp) {
-        // console.log('render', this.renderer.info.render.triangles);
         requestAnimationFrame(this.render.bind(this));
 
         if (this.start && timestamp) {

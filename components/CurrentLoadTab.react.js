@@ -75,7 +75,7 @@ export const CurrentLoadTab = (props) => {
         return {
           id: processor.id,
           processor: processor.id,
-          load: processor.currentLoad,
+          load: Math.floor(processor.currentLoad),
         };
       })
     );
